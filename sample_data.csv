@@ -1,0 +1,41 @@
+Order_ID,Region,Product_Category,Product,Sales,Profit,Quantity,Discount
+1001,North,Electronics,Laptop,1200,200,2,0.05
+1002,West,Furniture,Office Chair,350,80,3,0.10
+1003,South,Electronics,Tablet,500,120,2,0.08
+1004,East,Office Supplies,Printer Paper,120,30,5,0.02
+1005,North,Furniture,Desk,700,150,1,0.07
+1006,West,Electronics,Smartphone,900,220,2,0.06
+1007,South,Office Supplies,Stapler,40,10,4,0.01
+1008,East,Electronics,Monitor,300,70,2,0.04
+1009,North,Furniture,Bookshelf,450,90,1,0.05
+1010,West,Office Supplies,Notebook,60,15,6,0.03
+1011,South,Electronics,Keyboard,80,20,3,0.02
+1012,East,Furniture,Office Desk,650,140,1,0.06
+1013,North,Electronics,Mouse,40,12,5,0.02
+1014,West,Office Supplies,Markers,30,8,6,0.01
+1015,South,Furniture,Conference Table,1200,300,1,0.07
+1016,East,Electronics,External HDD,150,40,2,0.03
+1017,North,Office Supplies,Calculator,70,18,3,0.02
+1018,West,Furniture,Office Sofa,950,210,1,0.08
+1019,South,Electronics,Webcam,110,25,2,0.03
+1020,East,Office Supplies,Pen Set,25,7,8,0.01
+1021,North,Electronics,Router,140,35,2,0.04
+1022,West,Furniture,Cabinet,520,120,1,0.06
+1023,South,Office Supplies,Envelope Pack,45,10,5,0.02
+1024,East,Electronics,Speaker,200,50,2,0.05
+1025,North,Furniture,Office Stool,150,35,2,0.03
+1026,West,Electronics,Smartwatch,250,60,2,0.04
+1027,South,Office Supplies,Glue,20,5,5,0.01
+1028,East,Furniture,Reception Desk,800,190,1,0.07
+1029,North,Electronics,Microphone,130,30,2,0.04
+1030,West,Office Supplies,Highlighter,18,4,10,0.01
+1031,South,Furniture,Drawer Unit,340,70,1,0.05
+1032,East,Electronics,Projector,600,150,1,0.06
+1033,North,Office Supplies,Sticky Notes,15,3,10,0.01
+1034,West,Electronics,Graphics Tablet,420,95,1,0.05
+1035,South,Furniture,Meeting Chair,270,60,2,0.04
+1036,East,Office Supplies,Paper Clips,10,2,15,0.01
+1037,North,Electronics,USB Hub,45,12,4,0.02
+1038,West,Furniture,Standing Desk,900,220,1,0.07
+1039,South,Electronics,Bluetooth Adapter,35,9,4,0.02
+1040,East,Office Supplies,File Folder,28,6,6,0.02
