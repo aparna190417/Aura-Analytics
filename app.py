@@ -9,6 +9,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph, Table, TableStyle
 import plotly.graph_objs as go
+import tempfile
 
 # PAGE CONFIG 
 st.set_page_config(page_title="Aura Analytics", layout="wide", page_icon="🌌")
@@ -154,7 +155,7 @@ def auto_generate_charts(df):
     num_cols = df.select_dtypes(include='number').columns.tolist()
     cat_cols = df.select_dtypes(include='object').columns.tolist()
 
-    # 🔥 AI SMART DATE DETECTION (safe)
+    # Date detect
     date_cols = []
     for col in df.columns:
         try:
@@ -168,47 +169,53 @@ def auto_generate_charts(df):
     if len(date_cols) >= 1 and len(num_cols) >= 1:
         fig = px.line(df, x=date_cols[0], y=num_cols[0],
                       title=f"Time Trend: {num_cols[0]} over {date_cols[0]}")
-        charts.append(fig)
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+        fig.write_image(tmp.name)
+        charts.append(tmp.name)
 
     # 2️⃣ Histogram
     if len(num_cols) >= 1:
         fig = px.histogram(df, x=num_cols[0],
-                           title=f"Distribution of {num_cols[0]}",
-                           color_discrete_sequence=["#00d4ff"])
-        charts.append(fig)
+                           title=f"Distribution of {num_cols[0]}")
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+        fig.write_image(tmp.name)
+        charts.append(tmp.name)
 
     # 3️⃣ Bar
     if len(cat_cols) >= 1:
         top_data = df[cat_cols[0]].value_counts().head(10).reset_index()
         top_data.columns = ["Category", "Count"]
         fig = px.bar(top_data, x="Category", y="Count",
-                     title=f"Top Categories in {cat_cols[0]}",
-                     color="Count",
-                     color_continuous_scale="Blues")
-        charts.append(fig)
+                     title=f"Top Categories in {cat_cols[0]}")
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+        fig.write_image(tmp.name)
+        charts.append(tmp.name)
 
     # 4️⃣ Pie
     if len(cat_cols) >= 1:
         fig = px.pie(df, names=cat_cols[0],
-                     title=f"{cat_cols[0]} Distribution",
-                     color_discrete_sequence=px.colors.sequential.RdBu)
-        charts.append(fig)
+                     title=f"{cat_cols[0]} Distribution")
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+        fig.write_image(tmp.name)
+        charts.append(tmp.name)
 
     # 5️⃣ Line
     if len(num_cols) >= 1:
         fig = px.line(df, y=num_cols[0],
-                      title=f"Trend of {num_cols[0]}",
-                      color_discrete_sequence=["#00ff88"])
-        charts.append(fig)
+                      title=f"Trend of {num_cols[0]}")
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+        fig.write_image(tmp.name)
+        charts.append(tmp.name)
 
     # 6️⃣ Heatmap
     if len(num_cols) >= 2:
         corr = df[num_cols].corr()
         fig = px.imshow(corr,
                         text_auto=True,
-                        color_continuous_scale="RdBu",
                         title="Correlation Heatmap")
-        charts.append(fig)
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+        fig.write_image(tmp.name)
+        charts.append(tmp.name)
 
     return charts
 
