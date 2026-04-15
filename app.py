@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import io
-import os
-import numpy as np
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -156,7 +154,7 @@ def auto_generate_charts(df):
     num_cols = df.select_dtypes(include='number').columns.tolist()
     cat_cols = df.select_dtypes(include='object').columns.tolist()
 
-    #  AI SMART DATE DETECTION
+    # 🔥 AI SMART DATE DETECTION (safe)
     date_cols = []
     for col in df.columns:
         try:
@@ -166,57 +164,51 @@ def auto_generate_charts(df):
         except:
             continue
 
-    #  Time Series 
+    # 1️⃣ Time Series
     if len(date_cols) >= 1 and len(num_cols) >= 1:
         fig = px.line(df, x=date_cols[0], y=num_cols[0],
                       title=f"Time Trend: {num_cols[0]} over {date_cols[0]}")
-        fig.write_image("chart_time.png", width=1200, height=700)
-        charts.append("chart_time.png")
+        charts.append(fig)
 
-    #  Histogram
+    # 2️⃣ Histogram
     if len(num_cols) >= 1:
         fig = px.histogram(df, x=num_cols[0],
-                   title=f"Distribution of {num_cols[0]}",
-                   color_discrete_sequence=["#00d4ff"])
-        fig.write_image("chart_hist.png", width=1200, height=700)
-        charts.append("chart_hist.png")
+                           title=f"Distribution of {num_cols[0]}",
+                           color_discrete_sequence=["#00d4ff"])
+        charts.append(fig)
 
-    #  Bar (Top categories)
+    # 3️⃣ Bar
     if len(cat_cols) >= 1:
         top_data = df[cat_cols[0]].value_counts().head(10).reset_index()
         top_data.columns = ["Category", "Count"]
         fig = px.bar(top_data, x="Category", y="Count",
-             title=f"Top Categories in {cat_cols[0]}",
-             color="Count",
-             color_continuous_scale="Blues")
-        fig.write_image("chart_bar.png", width=1200, height=700)
-        charts.append("chart_bar.png")
+                     title=f"Top Categories in {cat_cols[0]}",
+                     color="Count",
+                     color_continuous_scale="Blues")
+        charts.append(fig)
 
-    #  Pie
+    # 4️⃣ Pie
     if len(cat_cols) >= 1:
         fig = px.pie(df, names=cat_cols[0],
-             title=f"{cat_cols[0]} Distribution",
-             color_discrete_sequence=px.colors.sequential.RdBu)
-        fig.write_image("chart_pie.png", width=1200, height=700)
-        charts.append("chart_pie.png")
+                     title=f"{cat_cols[0]} Distribution",
+                     color_discrete_sequence=px.colors.sequential.RdBu)
+        charts.append(fig)
 
-    #  Line (trend)
+    # 5️⃣ Line
     if len(num_cols) >= 1:
         fig = px.line(df, y=num_cols[0],
-              title=f"Trend of {num_cols[0]}",
-              color_discrete_sequence=["#00ff88"])
-        fig.write_image("chart_line.png", width=1200, height=700)
-        charts.append("chart_line.png")
+                      title=f"Trend of {num_cols[0]}",
+                      color_discrete_sequence=["#00ff88"])
+        charts.append(fig)
 
-    #  Heatmap
+    # 6️⃣ Heatmap
     if len(num_cols) >= 2:
         corr = df[num_cols].corr()
         fig = px.imshow(corr,
-                text_auto=True,
-                color_continuous_scale="RdBu",
-                title="Correlation Heatmap")
-        fig.write_image("chart_heatmap.png", width=1200, height=700)
-        charts.append("chart_heatmap.png")
+                        text_auto=True,
+                        color_continuous_scale="RdBu",
+                        title="Correlation Heatmap")
+        charts.append(fig)
 
     return charts
 
@@ -270,28 +262,32 @@ def create_pdf(df, insights, charts):
         p.drawCentredString(x_pos + 72, height-585, val)
         x_pos += 165
 
-    p.showPage() # Cover page khatam
+    p.showPage()  # Cover page finished
 
-    # CHARTS 
-    for img_path in charts:
-     try:
-        p.setFillColorRGB(0.05, 0.15, 0.3)
-        p.rect(0, height-60, width, 60, fill=1, stroke=0)
+    # --- CHARTS (SAFE VERSION) ---
+    for i, fig in enumerate(charts):
+        try:
+            # Header for chart page
+            p.setFillColorRGB(0.05, 0.15, 0.3)
+            p.rect(0, height-60, width, 60, fill=1, stroke=0)
 
-        p.setFont("Helvetica-Bold", 14)
-        p.setFillColorRGB(1, 1, 1)
-        p.drawString(50, height-37, "VISUAL ANALYSIS")
+            p.setFont("Helvetica-Bold", 14)
+            p.setFillColorRGB(1, 1, 1)
+            p.drawString(50, height-37, f"VISUAL ANALYSIS - CHART {i+1}")
 
-        img = ImageReader(img_path)
-        p.drawImage(img, 50, height-500, width=500, height=350)
-
-        p.showPage()
-
-     except Exception as e:
-        p.setFont("Helvetica", 10)
-        p.setFillColorRGB(1, 0, 0)
-        p.drawString(50, height-300, f"Error rendering {img_path}: {str(e)}")
-        p.showPage()
+            # Placeholder Text
+            p.setFillColorRGB(0, 0, 0)
+            p.setFont("Helvetica", 12)
+            p.drawString(50, height-200, f"Chart {i+1} is available in the web app.")
+            p.drawString(50, height-220, "Please view interactive charts online.")
+            
+            p.showPage()
+            
+        except Exception as e:
+            p.setFont("Helvetica", 10)
+            p.setFillColorRGB(1, 0, 0)
+            p.drawString(50, height-300, f"Error rendering chart {i+1}: {str(e)}")
+            p.showPage()
 
     p.save()
     buffer.seek(0)
