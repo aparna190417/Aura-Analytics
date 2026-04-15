@@ -253,32 +253,28 @@ def create_pdf(df, insights, charts):
         p.drawCentredString(x_pos + 72, height-585, val)
         x_pos += 165
 
-    p.showPage()  # Cover page finished
+        p.showPage()  
 
     # --- CHARTS (SAFE VERSION) ---
     for i, fig in enumerate(charts):
-        try:
-            # Header for chart page
-            p.setFillColorRGB(0.05, 0.15, 0.3)
-            p.rect(0, height-60, width, 60, fill=1, stroke=0)
+     try:
+        p.setFillColorRGB(0.05, 0.15, 0.3)
+        p.rect(0, height-60, width, 60, fill=1, stroke=0)
 
-            p.setFont("Helvetica-Bold", 14)
-            p.setFillColorRGB(1, 1, 1)
-            p.drawString(50, height-37, f"VISUAL ANALYSIS - CHART {i+1}")
+        p.setFont("Helvetica-Bold", 14)
+        p.setFillColorRGB(1, 1, 1)
+        p.drawString(50, height-37, f"VISUAL ANALYSIS - CHART {i+1}")
 
-            # Placeholder Text
-            p.setFillColorRGB(0, 0, 0)
-            p.setFont("Helvetica", 12)
-            p.drawString(50, height-200, f"Chart {i+1} is available in the web app.")
-            p.drawString(50, height-220, "Please view interactive charts online.")
-            
-            p.showPage()
-            
-        except Exception as e:
-            p.setFont("Helvetica", 10)
-            p.setFillColorRGB(1, 0, 0)
-            p.drawString(50, height-300, f"Error rendering chart {i+1}: {str(e)}")
-            p.showPage()
+        img = ImageReader(fig)
+        p.drawImage(img, 50, height-500, width=500, height=350)
+
+        p.showPage()
+
+     except Exception as e:
+        p.setFont("Helvetica", 10)
+        p.setFillColorRGB(1, 0, 0)
+        p.drawString(50, height-300, f"Error rendering chart {i+1}: {str(e)}")
+        p.showPage()
 
     p.save()
     buffer.seek(0)
