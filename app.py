@@ -10,6 +10,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph, Table, TableStyle
 import plotly.graph_objs as go
 import tempfile
+import matplotlib.pyplot as plt
 
 # PAGE CONFIG 
 st.set_page_config(page_title="Aura Analytics", layout="wide", page_icon="🌌")
@@ -149,72 +150,55 @@ The most frequent category is '{top_cat}', suggesting dominant patterns in this 
 • Handle missing values using imputation techniques.
 • Apply machine learning models for forecasting and segmentation.
 """
-# AUTO GENERATE CHART
 def auto_generate_charts(df):
     charts = []
     num_cols = df.select_dtypes(include='number').columns.tolist()
     cat_cols = df.select_dtypes(include='object').columns.tolist()
 
-    # Date detect
-    date_cols = []
-    for col in df.columns:
-        try:
-            pd.to_datetime(df[col], errors='ignore')
-            date_cols.append(col)
-            break
-        except:
-            continue
-
-    # 1️⃣ Time Series
-    if len(date_cols) >= 1 and len(num_cols) >= 1:
-        fig = px.line(df, x=date_cols[0], y=num_cols[0],
-                      title=f"Time Trend: {num_cols[0]} over {date_cols[0]}")
-        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        fig.write_image(tmp.name)
-        charts.append(tmp.name)
-
-    # 2️⃣ Histogram
+    # 1️⃣ Histogram
     if len(num_cols) >= 1:
-        fig = px.histogram(df, x=num_cols[0],
-                           title=f"Distribution of {num_cols[0]}")
+        plt.figure()
+        df[num_cols[0]].hist()
+        plt.title(f"Distribution of {num_cols[0]}")
+
         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        fig.write_image(tmp.name)
+        plt.savefig(tmp.name)
+        plt.close()
         charts.append(tmp.name)
 
-    # 3️⃣ Bar
+    # 2️⃣ Bar chart
     if len(cat_cols) >= 1:
-        top_data = df[cat_cols[0]].value_counts().head(10).reset_index()
-        top_data.columns = ["Category", "Count"]
-        fig = px.bar(top_data, x="Category", y="Count",
-                     title=f"Top Categories in {cat_cols[0]}")
+        plt.figure()
+        df[cat_cols[0]].value_counts().head(10).plot(kind='bar')
+        plt.title(f"Top Categories in {cat_cols[0]}")
+
         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        fig.write_image(tmp.name)
+        plt.savefig(tmp.name)
+        plt.close()
         charts.append(tmp.name)
 
-    # 4️⃣ Pie
-    if len(cat_cols) >= 1:
-        fig = px.pie(df, names=cat_cols[0],
-                     title=f"{cat_cols[0]} Distribution")
-        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        fig.write_image(tmp.name)
-        charts.append(tmp.name)
-
-    # 5️⃣ Line
+    # 3️⃣ Line chart
     if len(num_cols) >= 1:
-        fig = px.line(df, y=num_cols[0],
-                      title=f"Trend of {num_cols[0]}")
+        plt.figure()
+        df[num_cols[0]].plot()
+        plt.title(f"Trend of {num_cols[0]}")
+
         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        fig.write_image(tmp.name)
+        plt.savefig(tmp.name)
+        plt.close()
         charts.append(tmp.name)
 
-    # 6️⃣ Heatmap
+    # 4️⃣ Heatmap (optional)
     if len(num_cols) >= 2:
+        plt.figure()
         corr = df[num_cols].corr()
-        fig = px.imshow(corr,
-                        text_auto=True,
-                        title="Correlation Heatmap")
+        plt.imshow(corr)
+        plt.colorbar()
+        plt.title("Correlation Heatmap")
+
         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        fig.write_image(tmp.name)
+        plt.savefig(tmp.name)
+        plt.close()
         charts.append(tmp.name)
 
     return charts
