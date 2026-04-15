@@ -253,7 +253,7 @@ def create_pdf(df, insights, charts):
         p.drawCentredString(x_pos + 72, height-585, val)
         x_pos += 165
 
-        p.showPage()  
+    p.showPage()  
 
     # --- CHARTS (SAFE VERSION) ---
     for i, fig in enumerate(charts):
