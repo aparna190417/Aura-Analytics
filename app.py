@@ -10,14 +10,12 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph, Table, TableStyle
-from pandasai import SmartDataframe
-from pandasai.llm.openai import OpenAI
 import plotly.graph_objs as go
 
-# ---------------- PAGE CONFIG ----------------
+# PAGE CONFIG 
 st.set_page_config(page_title="Aura Analytics", layout="wide", page_icon="🌌")
 
-# ---------------- THEME & CSS ENGINE ----------------
+# THEME & CSS ENGINE
 def apply_theme(theme_choice):
     if theme_choice == "Dark":
         bg = "#0e1117"; txt = "#ffffff"; card = "rgba(255,255,255,0.05)"; side = "#161b22"
@@ -45,7 +43,7 @@ def apply_theme(theme_choice):
     """, unsafe_allow_html=True)
     return chart_tpl
 
-# -----------Ask Ai------------
+# ASK AI
 def local_ai_chat(df, question):
     question = question.lower()
 
@@ -82,7 +80,7 @@ def local_ai_chat(df, question):
     except Exception as e:
         return str(e)
     
-# ---------------Ai insights ---------------------
+# AI INSIGHTS 
 def generate_ai_insights(df, num_cols, cat_cols):
     total_rows, total_cols = df.shape
     missing = df.isnull().sum().sum()
@@ -152,30 +150,30 @@ The most frequent category is '{top_cat}', suggesting dominant patterns in this 
 • Handle missing values using imputation techniques.
 • Apply machine learning models for forecasting and segmentation.
 """
-# ------------------------------
+# AUTO GENERATE CHART
 def auto_generate_charts(df):
     charts = []
     num_cols = df.select_dtypes(include='number').columns.tolist()
     cat_cols = df.select_dtypes(include='object').columns.tolist()
 
-    # 🔥 AI SMART DATE DETECTION
+    #  AI SMART DATE DETECTION
     date_cols = []
     for col in df.columns:
         try:
-            df[col] = pd.to_datetime(df[col])
+            pd.to_datetime(df[col], errors='ignore')
             date_cols.append(col)
             break
         except:
             continue
 
-    # 0️⃣ Time Series (if date found)
+    #  Time Series 
     if len(date_cols) >= 1 and len(num_cols) >= 1:
         fig = px.line(df, x=date_cols[0], y=num_cols[0],
                       title=f"Time Trend: {num_cols[0]} over {date_cols[0]}")
         fig.write_image("chart_time.png", width=1200, height=700)
         charts.append("chart_time.png")
 
-    # 1️⃣ Histogram
+    #  Histogram
     if len(num_cols) >= 1:
         fig = px.histogram(df, x=num_cols[0],
                    title=f"Distribution of {num_cols[0]}",
@@ -183,7 +181,7 @@ def auto_generate_charts(df):
         fig.write_image("chart_hist.png", width=1200, height=700)
         charts.append("chart_hist.png")
 
-    # 2️⃣ Bar (Top categories)
+    #  Bar (Top categories)
     if len(cat_cols) >= 1:
         top_data = df[cat_cols[0]].value_counts().head(10).reset_index()
         top_data.columns = ["Category", "Count"]
@@ -194,7 +192,7 @@ def auto_generate_charts(df):
         fig.write_image("chart_bar.png", width=1200, height=700)
         charts.append("chart_bar.png")
 
-    # 3️⃣ Pie
+    #  Pie
     if len(cat_cols) >= 1:
         fig = px.pie(df, names=cat_cols[0],
              title=f"{cat_cols[0]} Distribution",
@@ -202,7 +200,7 @@ def auto_generate_charts(df):
         fig.write_image("chart_pie.png", width=1200, height=700)
         charts.append("chart_pie.png")
 
-    # 4️⃣ Line (trend)
+    #  Line (trend)
     if len(num_cols) >= 1:
         fig = px.line(df, y=num_cols[0],
               title=f"Trend of {num_cols[0]}",
@@ -210,7 +208,7 @@ def auto_generate_charts(df):
         fig.write_image("chart_line.png", width=1200, height=700)
         charts.append("chart_line.png")
 
-    # 5️⃣ Heatmap
+    #  Heatmap
     if len(num_cols) >= 2:
         corr = df[num_cols].corr()
         fig = px.imshow(corr,
@@ -222,7 +220,7 @@ def auto_generate_charts(df):
 
     return charts
 
-# ---------------- PDF GENERATOR ----------------
+# PDF GENERATOR 
 def create_pdf(df, insights, charts):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
@@ -259,8 +257,7 @@ def create_pdf(df, insights, charts):
     m_values = [
         f"{df[num_cols_pdf[0]].mean():.2f}" if len(num_cols_pdf)>0 else "0.00",
         f"{df[num_cols_pdf[0]].max():.2f}" if len(num_cols_pdf)>0 else "0.00",
-        f"{len(num_cols_pdf)} Metrics"
-    ]
+        f"{len(num_cols_pdf)} Metrics"]
 
     x_pos = 80
     for label, val in zip(m_labels, m_values):
@@ -275,7 +272,7 @@ def create_pdf(df, insights, charts):
 
     p.showPage() # Cover page khatam
 
-    # --- PAGE 2+: CHARTS (MODIFIED LOOP) ---
+    # CHARTS 
     for img_path in charts:
      try:
         p.setFillColorRGB(0.05, 0.15, 0.3)
@@ -285,7 +282,6 @@ def create_pdf(df, insights, charts):
         p.setFillColorRGB(1, 1, 1)
         p.drawString(50, height-37, "VISUAL ANALYSIS")
 
-        # ✅ FIXED LINE
         img = ImageReader(img_path)
         p.drawImage(img, 50, height-500, width=500, height=350)
 
@@ -301,7 +297,7 @@ def create_pdf(df, insights, charts):
     buffer.seek(0)
     return buffer
 
-# ---------------- SIDEBAR ----------------
+#  SIDEBAR 
 with st.sidebar:
     st.markdown("<h1 style='text-align: center;'>🌌 AURA</h1>", unsafe_allow_html=True)
     theme_choice = st.radio("🎨 Theme", ["Dark", "Light"], horizontal=True)
@@ -311,7 +307,7 @@ with st.sidebar:
     st.markdown("---")
     st.success("Aura AI Engine Active")
 
-# ---------------- MAIN APP ----------------
+#  MAIN APP 
 st.title("🌌 Aura Analytics")
 file = st.file_uploader("📂 Upload your Dataset", type=["csv", "xlsx"])
 
@@ -390,7 +386,7 @@ if file:
         else:
             st.error("❌ Numeric data not found!")
 
-        # ✅ FREE CHATBOT
+        # CHATBOT
         st.markdown("## 🤖 Ask Your Data (AI Chatbot)")
         user_q = st.text_input("💬 Ask anything about your data:")
 
@@ -424,6 +420,6 @@ if file:
 else:
     st.info("👋 Welcome! Please upload a CSV or Excel file to start your analysis.")
 
-# ---------------- FOOTER ----------------
+# FOOTER 
 st.markdown("---")
 st.markdown("<center>✨ Aura Analytics | Built by <b>Aparna Patel</b></center>", unsafe_allow_html=True)
